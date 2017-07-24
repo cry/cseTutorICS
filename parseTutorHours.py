@@ -61,6 +61,7 @@ if current_year is None:
 
 
 ALLOCATION_URL = "https://cgi.cse.unsw.edu.au/~teachadmin/casual_academics/%s%s/apply/allocation.cgi" % (current_year, current_session)
+#ALLOCATION_URL = "https://carey.li/p/tut_test.php" # Test URL
 CLASSUTIL_API_URL = "https://classutil.carey.li/api?f=comp&s=%s" % (current_session)
 
 try:
@@ -107,6 +108,7 @@ for tut in chain:
 
     for token in loc_string.split(";"):
         token = token.split()
+        print token
 
         weeks = token[2][2:-1].split(",")
 
@@ -130,6 +132,11 @@ for tut in chain:
 
             end_epoch = ACADEMIC_DATES[current_full_session]["start"] + (end - 1) * SECONDS_WEEK + DAYS.index(token[0]) * SECONDS_DAY + hours[1] * SECONDS_HOUR
 
+            # Special location parsing because inconsistent formatting
+
+            if len(token) != 5: location = token[3].replace(")", "")
+            else: location = "%s %s" % (token[3], token[4].replace(")", ""))
+
             # TODO: Clean up this mess
             # The replace and string substrs change the time into ics format time
 
@@ -141,7 +148,7 @@ for tut in chain:
                                        .replace("__TEND__", datetime.fromtimestamp(class_end, TIMEZONE).isoformat().replace("-", "").replace(":", "")[:-5]) \
                                        .replace("__REND__", datetime.fromtimestamp(end_epoch, TIMEZONE).isoformat().replace("-", "").replace(":", "")[:-5]) \
                                        .replace("__DAY__", token[0][0:2].upper()) \
-                                       .replace("__LOCATION__", "%s %s" % (token[3], token[4].replace(")", ""))) \
+                                       .replace("__LOCATION__", location) \
 
 
 
